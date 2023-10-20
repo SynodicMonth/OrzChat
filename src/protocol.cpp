@@ -110,7 +110,7 @@ typedef JoinChannelPayload JoinChannelSuccessPayload;
 // ChannelID: ID of channel
 // Nickname: nickname of sender
 // MsgLength: length of message
-// Msg: message, in UTF-8 encoding
+// Msg: message, in UTF-16LE encoding
 
 typedef struct {
     uint32_t user_id;
@@ -173,7 +173,7 @@ typedef struct {
 // +----------+----------+
 // Server sends error message to client
 // ErrCode: error code
-// ErrMsg: error message, in UTF-8 encoding
+// ErrMsg: error message, in UTF-16LE encoding
 
 typedef struct {
     uint32_t err_code;
