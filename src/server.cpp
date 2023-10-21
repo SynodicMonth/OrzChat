@@ -75,7 +75,7 @@ int main() {
     ZeroMemory(&servAddr, sizeof(servAddr));
     servAddr.sin_family = AF_INET;
     servAddr.sin_addr.s_addr = INADDR_ANY;
-    servAddr.sin_port = htons(12345);
+    servAddr.sin_port = htons(PORT);
     if (bind(serverSock, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR) {
         win_printf(hConsoleOut, L"[ ERROR ] bind failed with error code: %ld\n", WSAGetLastError());
         closesocket(serverSock);
@@ -159,7 +159,7 @@ DWORD WINAPI ClientHandler(LPVOID lpParam) {
             win_printf(hConsoleOut, L"[ ERROR ] Client sent invalid login message\n");
             // send error message
             uint32_t totalSize;
-            char* buf = PackError(0, L"Invalid login message", totalSize);
+            char* buf = PackError(1, totalSize);
             send(clientSock, buf, totalSize, 0);
             delete[] buf;
             closesocket(clientSock);

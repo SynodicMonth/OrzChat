@@ -7,7 +7,7 @@
 // +------------+---------+--------------+
 // | MagicNumber|  Type   | PayloadLength|
 // +------------+---------+--------------+
-// |  O r z C   | 2 bytes |    4 bytes   |
+// |  O r z C   | 1 bytes |    4 bytes   |
 // +------------+---------+--------------+
 // |                                     |
 // |              Payload                |
@@ -166,14 +166,13 @@ typedef struct {
 } DisconnectPayload;
 
 // Error Payload
-// +----------+----------+
-// | ErrCode  | ErrMsg   |
-// +----------+----------+
-// |  4 bytes |  ...     |
-// +----------+----------+
+// +----------+
+// | ErrCode  |
+// +----------+
+// |  4 bytes |
+// +----------+
 // Server sends error message to client
 // ErrCode: error code
-// ErrMsg: error message, in UTF-16LE encoding
 
 typedef struct {
     uint32_t err_code;
@@ -223,11 +222,9 @@ char* PackSendMsg(uint32_t userId, uint32_t channelId, wchar_t nickname[32], con
     return buffer;
 }
 
-char* PackError(uint32_t errCode, const wchar_t* errMsg, uint32_t& totalPackSize) {
-    uint32_t errMsgLength = wcslen(errMsg);
-
+char* PackError(uint32_t errCode, uint32_t& totalPackSize) {
     // Calculate total size of the message (header + payload)
-    totalPackSize = sizeof(MessageHeader) + sizeof(ErrorPayload) + errMsgLength * sizeof(wchar_t);
+    totalPackSize = sizeof(MessageHeader) + sizeof(ErrorPayload);
 
     char* buffer = new char[totalPackSize];
     memset(buffer, 0, totalPackSize);
@@ -235,13 +232,10 @@ char* PackError(uint32_t errCode, const wchar_t* errMsg, uint32_t& totalPackSize
     MessageHeader* header = reinterpret_cast<MessageHeader*>(buffer);
     header->magic_number = 0x4F727A43; // ASCII for 'OrzC'
     header->type = ERR;
-    header->payload_length = sizeof(ErrorPayload) + errMsgLength * sizeof(wchar_t);
+    header->payload_length = sizeof(ErrorPayload);
 
     ErrorPayload* payload = reinterpret_cast<ErrorPayload*>(buffer + sizeof(MessageHeader));
     payload->err_code = errCode;
-
-    wchar_t* message = reinterpret_cast<wchar_t*>(buffer + sizeof(MessageHeader) + sizeof(ErrorPayload));
-    memcpy(message, errMsg, errMsgLength * sizeof(wchar_t));
 
     return buffer;
 }
